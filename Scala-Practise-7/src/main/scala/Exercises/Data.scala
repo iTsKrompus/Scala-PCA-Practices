@@ -5,10 +5,18 @@ case class Data (val t:() => Unit, val periodo: Int, var cuantoQueda: Int)
 class Monitor {
   var task = new ArrayBuffer[Data]()
   def alta (t:() => Unit, periodo: Int): Unit = synchronized{
-    …
+    task.append((Data(t,periodo,periodo)))
   }
   def actualizaTiempos (cantidad: Int): Unit = synchronized {
-    …
+    for(data<- task) {
+      if(data.cuantoQueda>0) {
+        data.cuantoQueda -= cantidad
+      }
+      else {
+        data.cuantoQueda=data.periodo
+        data.t()
+      }
+    }
   }
 }
 object TaskSchedulerMonitor extends App {
@@ -26,7 +34,8 @@ object TaskSchedulerMonitor extends App {
   miMonitor.alta (() => task1, 2)
   def task2 = println("Soy task2 y ejecuto cada 3 s")
   miMonitor.alta (() => task2, 3)
-  …
+  reloj.start()
+  reloj.join()
   Thread.sleep (12000)
   log ("Fin")
 }
