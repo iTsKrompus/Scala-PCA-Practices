@@ -1,18 +1,26 @@
 package Exercises
+
 import de._
 import scala.collection.mutable.ArrayBuffer
+import java.util.{Timer, TimerTask}
 
-//EJERCICIO 2
-case class Data (val t:() => Unit, val periodo: Int, var cuantoQueda: Int)
-class Monitor {
-  var task = new ArrayBuffer[Data]()
-  def alta (t:() => Unit, periodo: Int): Unit = synchronized{
-    task.append((Data(t,periodo,periodo)))
+//EJERCICIO 3
+case class DataTimer (val t:() => Unit, val periodo: Int, var cuantoQueda: Int)
+class MyTimerTask extends TimerTask {
+  def run(): Unit = {
+
   }
-  def actualizaTiempos (cantidad: Int): Unit = synchronized {
-    for(data<- task) {
+}
+class Monitor2 {
+  var task = new ArrayBuffer[DataTimer]()
+  def alta (t:() => Unit, periodo: Int): Unit = synchronized{
+    task.append((DataTimer(t,periodo,periodo)))
+  }
+
+  def actualizaTiempos(cantidad: Int): Unit = synchronized {
+    for (data <- task) {
       data.cuantoQueda -= cantidad
-      if(data.cuantoQueda<=0) {
+      if (data.cuantoQueda <= 0) {
         data.cuantoQueda = data.periodo
         data.t()
       }
@@ -20,7 +28,7 @@ class Monitor {
     }
   }
 }
-object TaskSchedulerMonitor extends App {
+object TaskSchedulerMonitor2 extends App {
   val miMonitor = new Monitor
   val reloj = new Thread {
     var tiempoTranscurrido: Int = 0
