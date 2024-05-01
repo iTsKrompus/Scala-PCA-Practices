@@ -4,7 +4,11 @@ import scala.io._
 import java.io._
 
 class PonBlancoActor (fe: String, out: ActorRef) extends Actor {
-  def receive = PartialFunction.empty // no recibe mensajes
+  var conta: Integer =
+  def receive = {
+    case _ ⇒
+      var conta
+  }
   …
 }
 object PonBlancoActor {
@@ -29,6 +33,22 @@ object ExeActors801 extends App {
   val pCL: ActorRef = ourSystem.actorOf(PonCambioDeLineaActor.props(fs))
   val pFl: ActorRef = ourSystem.actorOf (PonFlechaActor.props (pCL))
   val pBl: ActorRef = ourSystem.actorOf (PonBlancoActor.props (fe, pFl))
+  val contenido = Source.fromFile(fe) // siendo fe el nombre de fichero
+  var cont: Integer = 1
+  var last: Char = 'p'
+  for (c <- contenido) {
+    //iteración
+    pBl ! c
+
+    }
+
+  // para cerrar el fichero
+  contenido.close
+  // abrir un fichero para escritura y escribir un carácter
+  val fo = new PrintWriter(new File(fs)) // fs es el nombre del fichero
+  fo.print(c) // o para escribir cambio de línea fo.println
+  // para cerrar el fichero
+  fo.close
   Thread.sleep (5000)
   println ("FIN")
   ourSystem.terminate
