@@ -1,0 +1,60 @@
+PG3
+
+val jane = new Account("Jane", 100)
+val john = new Account("John", 200)
+val t1 = thread { add(jane, 5) }
+val t2 = thread { add(john, 50) }
+val t3 = thread { add(jane, 70) }
+t1.join(); t2.join(); t3.join()
+log(s"--- transfers ---\n$transfers"
+
+En este ejemplo, los join solo impide que el main avance hasta los log para que no se ejecute sin haber terminado los hilos, pero los hilos pueden tener condiciones de carrera. Ahora bien, dado que tenemos un shyncroniced en add y al crear un log y meterlo en el buffer de logs, no hay ningún problema.
+
+PG4
+object SynchronizedDeadlock extends App {
+import SynchronizedNesting.Account
+def send(a: Account, b: Account, n: Int) = a.synchronized {
+b.synchronized {
+a.money -= n
+b.money += n
+}
+
+EJEMPLO:
+
+val a = new Account("Jack", 1000)
+val b = new Account("Jill", 2000)
+val t1 = thread { for (i<- 0 until 1000) {send(a, b, 1); log (s"send
+a to b: $i")}}
+val t2 = thread { for (i<- 0 until 1000) {send(b, a, 1); log (s"send
+b to a: $i")}}
+t1.join(); t2.join()
+log(s"a = ${a.money}, b = ${b.money}")
+}
+
+En este ejemplo, podría ocurrir interbloqueo dado que, si se ejecuta a la vez el t1 y t2 y el t1 usa shincronicedd en a y t2 en b, dado que la primera cuenta se queda en exclusión mútua (se coje) y la segunda ya está ocupada por el otro thread, ambos thread quieren coger la segunda cuenta y ninguno puede.
+
+PG2
+
+object SynchronizedNesting extends App {
+import scala.collection._
+private val transfers = mutable.ArrayBuffer[String]()
+def logTransfer(name: String, n: Int) = transfers.synchronized {
+transfers += s"transfer to account '$name' = $n"
+}
+
+clase Account y el método add, que suma una cantidad n al objeto Account:
+class Account(val name: String, var money: Int)
+def add(account: Account, n: Int) = account.synchronized {
+account.money += n
+if (n > 10) logTransfer(account.name, n)
+}
+
+Si se realiza este ejemplo:
+
+transfers += s"transfer to account '$name' = $n"
+transfers += s"transfer to account '$name' = $n"
+
+Sin el lig transfers
+
+
+
